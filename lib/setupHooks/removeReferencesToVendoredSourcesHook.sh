@@ -3,13 +3,17 @@
 removeReferencesToVendoredSources() {
   local installLocation="${1:-${out:?not defined}}"
   local vendoredDir="${2:-${cargoVendorDir:?not defined}}"
+  local fdDir="/proc/self/fd"
+  if ! [ -d "$fdDir" ]; then
+	  fdDir = "/dev/fd"
+  fi
 
   (
     exec 3>&1
     echo stripping references to cargoVendorDir from:
     find "${installLocation}" -type f |
       sort |
-      tee -a /dev/fd/3 |
+      tee -a "$fdDir/3" |
       xargs --no-run-if-empty sed -i'' -f <(
         echo -n 's!@storeDir@/\(eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 
